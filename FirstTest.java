@@ -1,14 +1,15 @@
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 
 public class FirstTest {
-    private AppiumDriver driver;
+    waitForElements waitById = new waitForElements();
+    waitForElements waitByXPath = new waitForElements();
 
     @Before
     public void setUp() throws Exception{
@@ -19,18 +20,34 @@ public class FirstTest {
         capabilities.setCapability("automationName","Appium");
         capabilities.setCapability("appPackage","org.wikipedia");
         capabilities.setCapability("appActivity",".main.MainActivity");
-        capabilities.setCapability("app","Users/evgeniamargieva/Downloads/wikipedia-2-7-50406-huawei-2022-06-14.apk");
+        capabilities.setCapability("app","Users/evgeniamargieva/Downloads/org.wikipedia.apk");
 
-        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+        waitById.driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
     }
 
     @After
     public void tearDown(){
-        driver.quit();
+        waitById.driver.quit();
     }
 
     @Test
     public void firstTest(){
-        System.out.println("FirstTestRun");
+
+        WebElement element_to_init_search = waitById.driver.findElementByXPath(
+                "//*[contains(@text, 'Search Wikipedia')]"
+        );
+        element_to_init_search.click();
+
+        WebElement element_to_enter_search_line = waitById.waitForElementPresentById(
+                "org.wikipedia:id/search_src_text",
+                "Cannot find search input"
+        );
+        element_to_enter_search_line.sendKeys("Java");
+
+        waitByXPath.waitForElementPresentByXPath(
+                "//*[@resource-id='org.wikipedia:id/page_list_item_description']//*[@text='Object-oriented programming language']",
+                "Cannot find 'Object-oriented programming language'",
+                15
+        );
     }
 }
